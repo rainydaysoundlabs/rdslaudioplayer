@@ -368,6 +368,34 @@
   color: #71717A;
   text-align: center;
   padding: 0.75rem;
+
+/* Player Footer - Custom Branding */
+.player-footer {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  text-align: center;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 0.75rem;
+  color: #71717A;
+  letter-spacing: 0.05em;
+}
+
+.player-footer .brand-name {
+  font-weight: 700;
+  color: #d62028;
+}
+
+.player-footer .separator {
+  margin: 0 0.5rem;
+  color: #71717A;
+}
+
+.player-footer .tool-description {
+  font-weight: 500;
+  color: #A1A1AA;
+}
+
   background-color: rgba(255, 255, 255, 0.02);
   border-radius: 0.25rem;
   margin-bottom: 1rem;

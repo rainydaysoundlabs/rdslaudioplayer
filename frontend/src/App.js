@@ -449,6 +449,13 @@ function AudioPlayer() {
         ))}
       </div>
 
+      {/* Custom Branding Footer */}
+      <div className="player-footer">
+        <span className="brand-name">Rainy Day Sound Labs</span>
+        <span className="separator">|</span>
+        <span className="tool-description">Analytical Audio Tool</span>
+      </div>
+
       {/* Hidden Audio Element */}
       {currentTrack && (
         <audio
