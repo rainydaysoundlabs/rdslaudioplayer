@@ -7,6 +7,8 @@ A simple, frontend-only audio player for comparing guitar pickup recordings with
 - ✅ **No Database Required** - All track data stored in JSON files
 - ✅ **URL-Based Track Sets** - Load different sets via URL parameters
 - ✅ **Synced Playhead** - Switch tracks while maintaining playback position
+- ✅ **Volume Control** - Adjust volume independently for level matching
+- ✅ **Keyboard Shortcuts** - Professional workflow with spacebar play/pause, arrow keys for navigation
 - ✅ **Scrollable Track List** - Handles 10+ tracks cleanly
 - ✅ **Dark Theme** - Professional dark UI with red accents
 
@@ -185,6 +187,30 @@ Edit `/frontend/src/index.js`:
 3. **Consistent Levels** - Normalize audio levels across all tracks
 4. **Clear Naming** - Use recognizable model names
 5. **Descriptive Text** - Include position (bridge/neck) and tone characteristics
+
+## Troubleshooting
+
+### Keyboard Shortcuts
+
+The player includes professional keyboard shortcuts for efficient A/B testing:
+
+| Shortcut | Action |
+|----------|--------|
+| **Space** | Play / Pause |
+| **↑** | Previous track |
+| **↓** | Next track |
+| **←** | Seek backward 5 seconds |
+| **→** | Seek forward 5 seconds |
+| **1-9** | Jump to track 1-9 |
+
+**Pro Tip**: Keep your mouse on the track list and use spacebar to quickly compare samples without moving your hand to the play button.
+
+### Volume Control
+
+- Independent volume slider for level matching between pickups
+- Default: 70% volume (safe for headphones)
+- Prevents ear fatigue when comparing hot vs. vintage-output pickups
+- Volume persists during track switching
 
 ## Troubleshooting
 

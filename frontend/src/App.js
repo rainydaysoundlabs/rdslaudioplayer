@@ -11,6 +11,7 @@ function AudioPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(0.7); // Default 70%
   const audioRef = useRef(null);
   const savedTimeRef = useRef(0);
 
@@ -54,6 +55,86 @@ function AudioPlayer() {
         setLoading(false);
       });
   }, []);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    if (!trackSet) return; // Only enable shortcuts when track set is loaded
+
+    const handleKeyPress = (e) => {
+      // Ignore if typing in an input field
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+      const tracks = trackSet.tracks || [];
+      
+      switch(e.code) {
+        case 'Space':
+          e.preventDefault();
+          togglePlayPause();
+          break;
+        
+        case 'ArrowUp':
+          e.preventDefault();
+          // Previous track
+          if (currentTrackIndex > 0) {
+            switchTrack(currentTrackIndex - 1);
+          }
+          break;
+        
+        case 'ArrowDown':
+          e.preventDefault();
+          // Next track
+          if (currentTrackIndex < tracks.length - 1) {
+            switchTrack(currentTrackIndex + 1);
+          }
+          break;
+        
+        case 'ArrowLeft':
+          e.preventDefault();
+          // Seek backward 5s
+          if (audioRef.current) {
+            audioRef.current.currentTime = Math.max(0, audioRef.current.currentTime - 5);
+          }
+          break;
+        
+        case 'ArrowRight':
+          e.preventDefault();
+          // Seek forward 5s
+          if (audioRef.current) {
+            audioRef.current.currentTime = Math.min(duration, audioRef.current.currentTime + 5);
+          }
+          break;
+        
+        case 'Digit1':
+        case 'Digit2':
+        case 'Digit3':
+        case 'Digit4':
+        case 'Digit5':
+        case 'Digit6':
+        case 'Digit7':
+        case 'Digit8':
+        case 'Digit9':
+          e.preventDefault();
+          const trackNum = parseInt(e.code.replace('Digit', '')) - 1;
+          if (trackNum < tracks.length) {
+            switchTrack(trackNum);
+          }
+          break;
+        
+        default:
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [trackSet, currentTrackIndex, isPlaying, duration]);
+
+  // Set volume on audio element
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+    }
+  }, [volume]);
 
   const togglePlayPause = () => {
     if (audioRef.current) {
@@ -112,6 +193,11 @@ function AudioPlayer() {
       audioRef.current.currentTime = newTime;
       setCurrentTime(newTime);
     }
+  };
+
+  const handleVolumeChange = (e) => {
+    const newVolume = parseFloat(e.target.value);
+    setVolume(newVolume);
   };
 
   const formatTime = (seconds) => {
@@ -222,6 +308,17 @@ function AudioPlayer() {
         </div>
       )}
 
+      {/* Play/Pause Button */}
+      <div className="controls-section">
+        <button 
+          className="play-pause-btn"
+          onClick={togglePlayPause}
+          data-testid="play-pause-btn"
+        >
+          {isPlaying ? <Pause size={24} /> : <Play size={24} />}
+        </button>
+      </div>
+
       {/* Progress Bar */}
       <div className="progress-section">
         <div 
@@ -246,15 +343,33 @@ function AudioPlayer() {
         </div>
       </div>
 
-      {/* Play/Pause Button */}
-      <div className="controls-section">
-        <button 
-          className="play-pause-btn"
-          onClick={togglePlayPause}
-          data-testid="play-pause-btn"
-        >
-          {isPlaying ? <Pause size={24} /> : <Play size={24} />}
-        </button>
+      {/* Volume Control */}
+      <div className="volume-section">
+        <div className="volume-label">Volume</div>
+        <div className="volume-control">
+          <span className="volume-icon">🔈</span>
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value={volume}
+            onChange={handleVolumeChange}
+            className="volume-slider"
+            data-testid="volume-slider"
+          />
+          <span className="volume-icon">🔊</span>
+          <span className="volume-percentage">{Math.round(volume * 100)}%</span>
+        </div>
+      </div>
+
+      {/* Keyboard Shortcuts Hint */}
+      <div className="shortcuts-hint">
+        <span>⌨️ Shortcuts: </span>
+        <code>Space</code> Play/Pause · 
+        <code>↑↓</code> Switch Tracks · 
+        <code>←→</code> Seek · 
+        <code>1-9</code> Jump to Track
       </div>
 
       {/* Scrollable Track List */}
