@@ -12,6 +12,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
@@ -365,6 +366,9 @@ function AdminDashboard() {
             <DialogContent className="dialog-content">
               <DialogHeader>
                 <DialogTitle>{editingTrack ? "Edit Track" : "Add New Track"}</DialogTitle>
+                <DialogDescription>
+                  {editingTrack ? "Update the track details below." : "Fill in the details for your guitar pickup sample."}
+                </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="track-form">
                 <div className="form-field">
