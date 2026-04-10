@@ -1,0 +1,40 @@
+{
+  "setName": "Red House Pickups - Vintage Series",
+  "tracks": [
+    {
+      "id": "1",
+      "title": "Seymour Duncan SH-4 JB",
+      "description": "Bridge humbucker - High output with tight low end",
+      "audioUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+      "imageUrl": "https://images.unsplash.com/photo-1708164592948-bc5cc7f74d49?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2ODh8MHwxfHNlYXJjaHw0fHxlbGVjdHJpYyUyMGd1aXRhciUyMGh1bWJ1Y2tlciUyMHBpY2t1cHxlbnwwfHx8fDE3NzU4Mjc0NzR8MA&ixlib=rb-4.1.0&q=85"
+    },
+    {
+      "id": "2",
+      "title": "DiMarzio PAF Pro",
+      "description": "Neck position - Warm and clear vintage tone",
+      "audioUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+      "imageUrl": "https://images.unsplash.com/photo-1708164592913-f8a7a32d2c50?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2ODh8MHwxfHNlYXJjaHwyfHxlbGVjdHJpYyUyMGd1aXRhciUyMGh1bWJ1Y2tlciUyMHBpY2t1cHxlbnwwfHx8fDE3NzU4Mjc0NzR8MA&ixlib=rb-4.1.0&q=85"
+    },
+    {
+      "id": "3",
+      "title": "EMG 81",
+      "description": "Active pickup - Aggressive tone for metal",
+      "audioUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+      "imageUrl": "https://images.unsplash.com/photo-1708165802535-699856e62d87?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2ODh8MHwxfHNlYXJjaHwxfHxlbGVjdHJpYyUyMGd1aXRhciUyMGh1bWJ1Y2tlciUyMHBpY2t1cHxlbnwwfHx8fDE3NzU4Mjc0NzR8MA&ixlib=rb-4.1.0&q=85"
+    },
+    {
+      "id": "4",
+      "title": "Fender Texas Special",
+      "description": "Single coil - Classic Stratocaster sound",
+      "audioUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
+      "imageUrl": "https://images.unsplash.com/photo-1708164592948-bc5cc7f74d49?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2ODh8MHwxfHNlYXJjaHw0fHxlbGVjdHJpYyUyMGd1aXRhciUyMGh1bWJ1Y2tlciUyMHBpY2t1cHxlbnwwfHx8fDE3NzU4Mjc0NzR8MA&ixlib=rb-4.1.0&q=85"
+    },
+    {
+      "id": "5",
+      "title": "Gibson 490R",
+      "description": "Neck humbucker - Balanced vintage PAF tone",
+      "audioUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3",
+      "imageUrl": "https://images.unsplash.com/photo-1708164592913-f8a7a32d2c50?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2ODh8MHwxfHNlYXJjaHwyfHxlbGVjdHJpYyUyMGd1aXRhciUyMGh1bWJ1Y2tlciUyMHBpY2t1cHxlbnwwfHx8fDE3NzU4Mjc0NzR8MA&ixlib=rb-4.1.0&q=85"
+    }
+  ]
+}

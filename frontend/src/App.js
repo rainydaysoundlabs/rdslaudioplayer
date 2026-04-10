@@ -1,62 +1,44 @@
 import { useState, useRef, useEffect } from "react";
 import "@/App.css";
-import { BrowserRouter, Routes, Route, Link, useNavigate } from "react-router-dom";
-import { Play, Pause, Plus, Edit2, Trash2, Settings } from "lucide-react";
-import axios from "axios";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogTrigger,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { toast } from "sonner";
-import { Toaster } from "@/components/ui/sonner";
+import { Play, Pause } from "lucide-react";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
-
-// Viewer Widget Component
-function ViewerWidget() {
-  const [tracks, setTracks] = useState([]);
+function AudioPlayer() {
+  const [trackSet, setTrackSet] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [loading, setLoading] = useState(true);
   const audioRef = useRef(null);
   const savedTimeRef = useRef(0);
 
   useEffect(() => {
-    fetchTracks();
-  }, []);
+    const urlParams = new URLSearchParams(window.location.search);
+    const setParam = urlParams.get('set');
 
-  const fetchTracks = async () => {
-    try {
-      const response = await axios.get(`${API}/tracks`);
-      setTracks(response.data);
+    if (!setParam) {
       setLoading(false);
-    } catch (error) {
-      console.error("Error fetching tracks:", error);
-      setLoading(false);
+      return;
     }
-  };
 
-  const currentTrack = tracks[currentTrackIndex];
+    fetch(`/tracksets/${setParam}.json`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Track set "${setParam}" not found`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        setTrackSet(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Error loading track set:', err);
+        setError(err.message);
+        setLoading(false);
+      });
+  }, []);
 
   const togglePlayPause = () => {
     if (audioRef.current) {
@@ -126,20 +108,56 @@ function ViewerWidget() {
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
+  // Loading state
   if (loading) {
     return (
       <div className="viewer-container">
-        <div className="loading-state">Loading tracks...</div>
+        <div className="loading-state">Loading track set...</div>
       </div>
     );
   }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="viewer-container">
+        <div className="error-state">
+          <h2>Track Set Not Found</h2>
+          <p>{error}</p>
+          <p className="hint">Check the URL parameter or contact support.</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Default state - no track set parameter
+  if (!trackSet) {
+    return (
+      <div className="default-container">
+        <div className="default-content">
+          <div className="logo-container">
+            <svg className="rdsl-logo" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="100" cy="100" r="80" stroke="#d62028" strokeWidth="4" fill="none"/>
+              <path d="M60 100 L90 70 L90 130 Z" fill="#d62028"/>
+              <circle cx="130" cy="100" r="20" fill="#d62028"/>
+            </svg>
+          </div>
+          <h1 className="default-title">Pickup Comparison Player</h1>
+          <p className="default-subtitle">Coming Soon</p>
+          <p className="default-hint">Add <code>?set=yourset</code> to the URL to load a track set</p>
+        </div>
+      </div>
+    );
+  }
+
+  const tracks = trackSet.tracks || [];
+  const currentTrack = tracks[currentTrackIndex];
 
   if (tracks.length === 0) {
     return (
       <div className="viewer-container">
         <div className="empty-state">
-          <p>No tracks available yet.</p>
-          <Link to="/admin" className="admin-link">Go to Admin Panel</Link>
+          <p>This track set is empty.</p>
         </div>
       </div>
     );
@@ -147,6 +165,11 @@ function ViewerWidget() {
 
   return (
     <div className="viewer-container">
+      {/* Set Name */}
+      <div className="set-name" data-testid="set-name">
+        {trackSet.setName}
+      </div>
+
       {/* Header with current track */}
       {currentTrack && (
         <div className="viewer-header">
@@ -230,14 +253,6 @@ function ViewerWidget() {
         ))}
       </div>
 
-      {/* Admin link */}
-      <div className="viewer-footer">
-        <Link to="/admin" className="settings-link" data-testid="admin-link">
-          <Settings size={16} />
-          Admin Panel
-        </Link>
-      </div>
-
       {/* Hidden Audio Element */}
       {currentTrack && (
         <audio
@@ -252,249 +267,10 @@ function ViewerWidget() {
   );
 }
 
-// Admin Dashboard Component
-function AdminDashboard() {
-  const [tracks, setTracks] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingTrack, setEditingTrack] = useState(null);
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    audioUrl: "",
-    imageUrl: ""
-  });
-
-  useEffect(() => {
-    fetchTracks();
-  }, []);
-
-  const fetchTracks = async () => {
-    try {
-      const response = await axios.get(`${API}/tracks`);
-      setTracks(response.data);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching tracks:", error);
-      toast.error("Failed to load tracks");
-      setLoading(false);
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    try {
-      if (editingTrack) {
-        await axios.put(`${API}/tracks/${editingTrack.id}`, formData);
-        toast.success("Track updated successfully");
-      } else {
-        await axios.post(`${API}/tracks`, formData);
-        toast.success("Track created successfully");
-      }
-      
-      setDialogOpen(false);
-      resetForm();
-      fetchTracks();
-    } catch (error) {
-      console.error("Error saving track:", error);
-      toast.error("Failed to save track");
-    }
-  };
-
-  const handleEdit = (track) => {
-    setEditingTrack(track);
-    setFormData({
-      title: track.title,
-      description: track.description,
-      audioUrl: track.audioUrl,
-      imageUrl: track.imageUrl
-    });
-    setDialogOpen(true);
-  };
-
-  const handleDelete = async (trackId) => {
-    if (!window.confirm("Are you sure you want to delete this track?")) return;
-    
-    try {
-      await axios.delete(`${API}/tracks/${trackId}`);
-      toast.success("Track deleted successfully");
-      fetchTracks();
-    } catch (error) {
-      console.error("Error deleting track:", error);
-      toast.error("Failed to delete track");
-    }
-  };
-
-  const resetForm = () => {
-    setEditingTrack(null);
-    setFormData({
-      title: "",
-      description: "",
-      audioUrl: "",
-      imageUrl: ""
-    });
-  };
-
-  const handleDialogChange = (open) => {
-    setDialogOpen(open);
-    if (!open) {
-      resetForm();
-    }
-  };
-
-  return (
-    <div className="admin-container">
-      <div className="admin-header">
-        <div>
-          <h1 className="admin-title">Guitar Pickup Comparison</h1>
-          <p className="admin-subtitle">Manage your pickup sample tracks</p>
-        </div>
-        <div className="admin-actions">
-          <Link to="/" data-testid="view-widget-link">
-            <Button variant="outline" className="view-widget-btn">
-              View Widget
-            </Button>
-          </Link>
-          <Dialog open={dialogOpen} onOpenChange={handleDialogChange}>
-            <DialogTrigger asChild>
-              <Button className="add-track-btn" data-testid="add-track-btn">
-                <Plus size={16} className="mr-2" />
-                Add Track
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="dialog-content">
-              <DialogHeader>
-                <DialogTitle>{editingTrack ? "Edit Track" : "Add New Track"}</DialogTitle>
-                <DialogDescription>
-                  {editingTrack ? "Update the track details below." : "Fill in the details for your guitar pickup sample."}
-                </DialogDescription>
-              </DialogHeader>
-              <form onSubmit={handleSubmit} className="track-form">
-                <div className="form-field">
-                  <Label htmlFor="title">Track Title</Label>
-                  <Input
-                    id="title"
-                    value={formData.title}
-                    onChange={(e) => setFormData({...formData, title: e.target.value})}
-                    placeholder="e.g., Humbucker Bridge Position"
-                    required
-                    data-testid="track-title-input"
-                  />
-                </div>
-                <div className="form-field">
-                  <Label htmlFor="description">Description</Label>
-                  <Textarea
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) => setFormData({...formData, description: e.target.value})}
-                    placeholder="e.g., Gibson 498T - Warm tone with clarity"
-                    required
-                    data-testid="track-description-input"
-                  />
-                </div>
-                <div className="form-field">
-                  <Label htmlFor="audioUrl">Audio URL</Label>
-                  <Input
-                    id="audioUrl"
-                    value={formData.audioUrl}
-                    onChange={(e) => setFormData({...formData, audioUrl: e.target.value})}
-                    placeholder="https://cdn.shopify.com/audio/pickup-sample.mp3"
-                    required
-                    data-testid="track-audio-url-input"
-                  />
-                </div>
-                <div className="form-field">
-                  <Label htmlFor="imageUrl">Image URL (square)</Label>
-                  <Input
-                    id="imageUrl"
-                    value={formData.imageUrl}
-                    onChange={(e) => setFormData({...formData, imageUrl: e.target.value})}
-                    placeholder="https://cdn.shopify.com/images/pickup.jpg"
-                    required
-                    data-testid="track-image-url-input"
-                  />
-                </div>
-                <DialogFooter>
-                  <Button type="submit" data-testid="save-track-btn">
-                    {editingTrack ? "Update Track" : "Create Track"}
-                  </Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
-        </div>
-      </div>
-
-      <div className="admin-content">
-        {loading ? (
-          <div className="loading-state">Loading tracks...</div>
-        ) : tracks.length === 0 ? (
-          <div className="empty-state">
-            <p>No tracks yet. Add your first pickup sample!</p>
-          </div>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-16">Image</TableHead>
-                <TableHead>Title</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead className="w-24">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {tracks.map((track) => (
-                <TableRow key={track.id} data-testid={`track-row-${track.id}`}>
-                  <TableCell>
-                    <img 
-                      src={track.imageUrl} 
-                      alt={track.title}
-                      className="admin-track-thumbnail"
-                    />
-                  </TableCell>
-                  <TableCell className="font-medium">{track.title}</TableCell>
-                  <TableCell className="text-muted">{track.description}</TableCell>
-                  <TableCell>
-                    <div className="action-buttons">
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        onClick={() => handleEdit(track)}
-                        data-testid={`edit-track-${track.id}`}
-                      >
-                        <Edit2 size={16} />
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        onClick={() => handleDelete(track.id)}
-                        data-testid={`delete-track-${track.id}`}
-                      >
-                        <Trash2 size={16} />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </div>
-    </div>
-  );
-}
-
 function App() {
   return (
     <div className="App">
-      <Toaster position="top-right" />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<ViewerWidget />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-        </Routes>
-      </BrowserRouter>
+      <AudioPlayer />
     </div>
   );
 }
