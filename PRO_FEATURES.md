@@ -40,6 +40,8 @@ This makes the player feel like a professional audio tool, not just a web widget
 | **→ (Right)** | Seek +5s | Jump to the solo section |
 | **1** | Jump to Track 1 | Instant access to reference pickup |
 | **2-9** | Jump to Track 2-9 | Direct track access |
+| **L** | Toggle Loop | Repeat current track for detailed comparison |
+| **R** | Reset to Defaults | Back to Track 1, 70% volume, start position |
 
 ### Pro Workflow Example
 
@@ -72,6 +74,62 @@ This makes the player feel like a professional audio tool, not just a web widget
 
 ---
 
+## Loop Mode
+
+### Why It Matters
+When you're comparing pickups on a specific riff or solo phrase, you want to hear it over and over. Loop mode lets you:
+- Repeat the same 4-bar phrase on each pickup
+- Focus on subtle tonal differences without manually restarting
+- Train your ear to detect pickup characteristics
+
+### How to Use
+1. **Enable Loop**: Click the 🔁 button or press **L**
+2. **Loop Active**: Button glows orange/red
+3. **Track Loops**: Current track plays continuously
+4. **Switch Tracks**: Loop stays enabled on new track
+5. **Disable**: Click button again or press **L**
+
+### Pro Tip: A/B Loop Workflow
+1. Find the perfect 8-bar comparison phrase
+2. Press **L** to enable loop
+3. Press **1** - Listen to reference pickup (loops)
+4. Press **2** - Switch to comparison pickup (loops from same position)
+5. Press **3** - Third option (loops)
+6. Decide which pickup nails the tone
+
+### Technical Details
+- Loops entire track (no section markers yet)
+- Persists across track switches
+- Visual indicator (orange button)
+- Keyboard shortcut: **L**
+
+---
+
+## Reset to Defaults
+
+### Why It Matters
+After hours of A/B testing, you might have:
+- Volume at 45% or 90%
+- Random track selected
+- Playhead at 2:37
+
+Reset instantly returns you to:
+- ✅ Track 1 (your reference)
+- ✅ 70% volume (safe level)
+- ✅ 0:00 playhead position
+
+### How to Use
+- **Button**: Click the ↺ button
+- **Keyboard**: Press **R**
+
+### When to Reset
+- Starting a fresh comparison session
+- After testing multiple pickups
+- Before sharing the player with someone
+- When you've lost track of settings
+
+---
+
 ## Combined Workflow: The Pro Experience
 
 ### Real-World Example: A/B Testing Bridge Pickups
@@ -98,12 +156,17 @@ This makes the player feel like a professional audio tool, not just a web widget
    - Much quieter → Increase volume to 75%
 
 4. **Compare specific section**:
+   - Press **L** to enable loop
    - Press **→** (5s forward) three times to reach solo
-   - Press **1** → **Space** (JB sound)
-   - Press **2** (PAF Pro sound at same position)
-   - Press **3** (490T sound at same position)
+   - Press **1** → **Space** (JB sound, looping)
+   - Press **2** (PAF Pro sound, looping at same position)
+   - Press **3** (490T sound, looping at same position)
+   - Press **L** to disable loop
 
-**Result**: You've just done professional-level A/B testing with level matching in under 2 minutes, using only keyboard shortcuts and one slider.
+5. **Reset for next session**:
+   - Press **R** to reset (Track 1, 70% volume, start)
+
+**Result**: You've just done professional-level A/B testing with level matching and loop comparison in under 2 minutes.
 
 ---
 

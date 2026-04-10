@@ -202,6 +202,8 @@ The player includes professional keyboard shortcuts for efficient A/B testing:
 | **←** | Seek backward 5 seconds |
 | **→** | Seek forward 5 seconds |
 | **1-9** | Jump to track 1-9 |
+| **L** | Toggle loop mode |
+| **R** | Reset to defaults |
 
 **Pro Tip**: Keep your mouse on the track list and use spacebar to quickly compare samples without moving your hand to the play button.
 
@@ -211,6 +213,19 @@ The player includes professional keyboard shortcuts for efficient A/B testing:
 - Default: 70% volume (safe for headphones)
 - Prevents ear fatigue when comparing hot vs. vintage-output pickups
 - Volume persists during track switching
+
+### Loop Mode
+
+- Loop current track for repetitive phrase comparison
+- Enable via button (🔁) or keyboard (**L**)
+- Visual indicator when active (orange glow)
+- Perfect for detailed tonal analysis
+
+### Reset to Defaults
+
+- Instantly return to Track 1, 70% volume, 0:00 position
+- Button (↺) or keyboard (**R**)
+- Cleans slate for fresh comparison sessions
 
 ## Troubleshooting
 

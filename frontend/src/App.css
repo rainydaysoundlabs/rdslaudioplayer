@@ -222,6 +222,8 @@
 .controls-section {
   display: flex;
   justify-content: center;
+  align-items: center;
+  gap: 1rem;
   margin-bottom: 1.5rem;
 }
 
@@ -244,6 +246,40 @@
 }
 
 .play-pause-btn:active {
+  transform: scale(0.95);
+}
+
+.loop-btn,
+.reset-btn {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #71717A;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.25rem;
+  transition: all 0.2s;
+}
+
+.loop-btn:hover,
+.reset-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #d62028;
+  border-color: #d62028;
+}
+
+.loop-btn.active {
+  background-color: rgba(214, 32, 40, 0.2);
+  color: #d62028;
+  border-color: #d62028;
+}
+
+.loop-btn:active,
+.reset-btn:active {
   transform: scale(0.95);
 }
 

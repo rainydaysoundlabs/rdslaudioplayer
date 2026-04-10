@@ -12,6 +12,7 @@ function AudioPlayer() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(0.7); // Default 70%
+  const [loopEnabled, setLoopEnabled] = useState(false);
   const audioRef = useRef(null);
   const savedTimeRef = useRef(0);
 
@@ -120,6 +121,16 @@ function AudioPlayer() {
           }
           break;
         
+        case 'KeyL':
+          e.preventDefault();
+          toggleLoop();
+          break;
+        
+        case 'KeyR':
+          e.preventDefault();
+          handleReset();
+          break;
+        
         default:
           break;
       }
@@ -135,6 +146,13 @@ function AudioPlayer() {
       audioRef.current.volume = volume;
     }
   }, [volume]);
+
+  // Set loop on audio element
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.loop = loopEnabled;
+    }
+  }, [loopEnabled]);
 
   const togglePlayPause = () => {
     if (audioRef.current) {
@@ -198,6 +216,18 @@ function AudioPlayer() {
   const handleVolumeChange = (e) => {
     const newVolume = parseFloat(e.target.value);
     setVolume(newVolume);
+  };
+
+  const handleReset = () => {
+    setVolume(0.7);
+    setCurrentTrackIndex(0);
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
+    }
+  };
+
+  const toggleLoop = () => {
+    setLoopEnabled(!loopEnabled);
   };
 
   const formatTime = (seconds) => {
@@ -311,11 +341,27 @@ function AudioPlayer() {
       {/* Play/Pause Button */}
       <div className="controls-section">
         <button 
+          className={`loop-btn ${loopEnabled ? 'active' : ''}`}
+          onClick={toggleLoop}
+          data-testid="loop-btn"
+          title="Loop current track (L)"
+        >
+          🔁
+        </button>
+        <button 
           className="play-pause-btn"
           onClick={togglePlayPause}
           data-testid="play-pause-btn"
         >
           {isPlaying ? <Pause size={24} /> : <Play size={24} />}
+        </button>
+        <button 
+          className="reset-btn"
+          onClick={handleReset}
+          data-testid="reset-btn"
+          title="Reset to defaults (R)"
+        >
+          ↺
         </button>
       </div>
 
@@ -369,7 +415,9 @@ function AudioPlayer() {
         <code>Space</code> Play/Pause · 
         <code>↑↓</code> Switch Tracks · 
         <code>←→</code> Seek · 
-        <code>1-9</code> Jump to Track
+        <code>1-9</code> Jump to Track ·
+        <code>L</code> Loop ·
+        <code>R</code> Reset
       </div>
 
       {/* Scrollable Track List */}
