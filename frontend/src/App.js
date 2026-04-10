@@ -3,6 +3,7 @@ import "@/App.css";
 import { Play, Pause } from "lucide-react";
 
 function AudioPlayer() {
+  const [config, setConfig] = useState(null);
   const [trackSet, setTrackSet] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -14,6 +15,20 @@ function AudioPlayer() {
   const savedTimeRef = useRef(0);
 
   useEffect(() => {
+    // Load config first
+    fetch('/config.json')
+      .then(response => response.json())
+      .then(data => setConfig(data))
+      .catch(() => {
+        // Use defaults if config not found
+        setConfig({
+          logoUrl: null,
+          defaultTitle: "Pickup Comparison Player",
+          defaultSubtitle: "Coming Soon"
+        });
+      });
+
+    // Check for track set parameter
     const urlParams = new URLSearchParams(window.location.search);
     const setParam = urlParams.get('set');
 
@@ -131,26 +146,44 @@ function AudioPlayer() {
   }
 
   // Default state - no track set parameter
-  if (!trackSet) {
+  if (!trackSet && config) {
     return (
       <div className="default-container">
         <div className="default-content">
           <div className="logo-container">
-            <svg className="rdsl-logo" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+            {config.logoUrl ? (
+              <img 
+                src={config.logoUrl} 
+                alt="Logo" 
+                className="custom-logo"
+                onError={(e) => {
+                  // Fallback to SVG if image fails to load
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'block';
+                }}
+              />
+            ) : null}
+            <svg 
+              className="rdsl-logo" 
+              viewBox="0 0 200 200" 
+              fill="none" 
+              xmlns="http://www.w3.org/2000/svg"
+              style={{ display: config.logoUrl ? 'none' : 'block' }}
+            >
               <circle cx="100" cy="100" r="80" stroke="#d62028" strokeWidth="4" fill="none"/>
               <path d="M60 100 L90 70 L90 130 Z" fill="#d62028"/>
               <circle cx="130" cy="100" r="20" fill="#d62028"/>
             </svg>
           </div>
-          <h1 className="default-title">Pickup Comparison Player</h1>
-          <p className="default-subtitle">Coming Soon</p>
+          <h1 className="default-title">{config.defaultTitle}</h1>
+          <p className="default-subtitle">{config.defaultSubtitle}</p>
           <p className="default-hint">Add <code>?set=yourset</code> to the URL to load a track set</p>
         </div>
       </div>
     );
   }
 
-  const tracks = trackSet.tracks || [];
+  const tracks = trackSet?.tracks || [];
   const currentTrack = tracks[currentTrackIndex];
 
   if (tracks.length === 0) {

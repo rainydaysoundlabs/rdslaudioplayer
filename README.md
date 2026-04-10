@@ -129,6 +129,28 @@ Add to your Shopify product page using an iframe:
 
 ## Customization
 
+### Custom Logo
+
+Edit `/public/config.json` to customize the default page:
+
+```json
+{
+  "logoUrl": "/logo.png",
+  "defaultTitle": "Your Brand Name",
+  "defaultSubtitle": "Coming Soon"
+}
+```
+
+**Logo Options:**
+- **Local file**: Place image in `/public/` and use `"/logo.png"`
+- **External URL**: Use full URL `"https://your-cdn.com/logo.png"`
+- **No logo**: Set to `null` to use default SVG icon
+
+**Logo Requirements:**
+- Format: PNG, JPG, or SVG
+- Recommended size: 200x200px max
+- Transparent background works best
+
 ### Colors
 Edit `/frontend/src/App.css`:
 - Background: `#121212`

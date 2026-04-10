@@ -98,6 +98,27 @@ Add this to your product page HTML:
 ></iframe>
 ```
 
+## Customization
+
+### Add Your Logo
+
+Edit `/public/config.json`:
+
+```json
+{
+  "logoUrl": "/logo.png",
+  "defaultTitle": "Your Company Name",
+  "defaultSubtitle": "Pickup Comparison Tool"
+}
+```
+
+**Steps:**
+1. Add your logo to `/public/logo.png`
+2. Update `logoUrl` in config.json
+3. Optionally change title and subtitle
+
+**Logo specs**: PNG/JPG, 200x200px max, transparent background recommended
+
 ## JSON Template
 
 Copy and customize this:
