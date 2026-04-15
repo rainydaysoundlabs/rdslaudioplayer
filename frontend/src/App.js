@@ -1,38 +1,72 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import "@/App.css";
-import { Play, Pause } from "lucide-react";
+import { Play, Pause, Repeat, RotateCcw } from "lucide-react";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "@/components/ui/accordion";
+
+const RDSL_LOGO_URL = "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_Logo01.svg?v=1761855758";
+
+function RDSLLogo() {
+  const [imgError, setImgError] = useState(false);
+
+  if (imgError) {
+    return (
+      <svg className="rdsl-logo-svg" viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <text x="10" y="42" fontFamily="Manrope, sans-serif" fontWeight="800" fontSize="40" fill="#d62028">RDSL</text>
+        <path d="M170 10 L185 30 L175 30 L185 50" stroke="#d62028" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+    );
+  }
+
+  return (
+    <img
+      src={RDSL_LOGO_URL}
+      alt="RDSL Logo"
+      className="rdsl-logo-img"
+      onError={() => setImgError(true)}
+    />
+  );
+}
+
+const POSITIONS = ["neck", "middle", "bridge"];
 
 function AudioPlayer() {
   const [config, setConfig] = useState(null);
   const [trackSet, setTrackSet] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
+
+  // Active selection: which pickup + which position
+  const [activePickupId, setActivePickupId] = useState(null);
+  const [activePosition, setActivePosition] = useState("neck");
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(0.7); // Default 70%
+  const [volume, setVolume] = useState(0.7);
   const [loopEnabled, setLoopEnabled] = useState(false);
+
   const audioRef = useRef(null);
   const savedTimeRef = useRef(0);
 
   useEffect(() => {
-    // Load config first
-    fetch('/config.json')
-      .then(response => response.json())
-      .then(data => setConfig(data))
-      .catch(() => {
-        // Use defaults if config not found
+    fetch("/config.json")
+      .then((r) => r.json())
+      .then((data) => setConfig(data))
+      .catch(() =>
         setConfig({
           logoUrl: null,
           defaultTitle: "Pickup Comparison Player",
-          defaultSubtitle: "Coming Soon"
-        });
-      });
+          defaultSubtitle: "Coming Soon",
+        })
+      );
 
-    // Check for track set parameter
     const urlParams = new URLSearchParams(window.location.search);
-    const setParam = urlParams.get('set');
+    const setParam = urlParams.get("set");
 
     if (!setParam) {
       setLoading(false);
@@ -40,121 +74,32 @@ function AudioPlayer() {
     }
 
     fetch(`/tracksets/${setParam}.json`)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`Track set "${setParam}" not found`);
-        }
+      .then((response) => {
+        if (!response.ok) throw new Error(`Track set "${setParam}" not found`);
         return response.json();
       })
-      .then(data => {
+      .then((data) => {
         setTrackSet(data);
+        if (data.pickups && data.pickups.length > 0) {
+          setActivePickupId(data.pickups[0].id);
+        }
         setLoading(false);
       })
-      .catch(err => {
-        console.error('Error loading track set:', err);
+      .catch((err) => {
         setError(err.message);
         setLoading(false);
       });
   }, []);
 
-  // Keyboard shortcuts
-  useEffect(() => {
-    if (!trackSet) return; // Only enable shortcuts when track set is loaded
+  // Get current audio URL
+  const getActiveAudioUrl = useCallback(() => {
+    if (!trackSet || !activePickupId) return null;
+    const pickup = trackSet.pickups.find((p) => p.id === activePickupId);
+    if (!pickup) return null;
+    return pickup.positions[activePosition]?.audioUrl || null;
+  }, [trackSet, activePickupId, activePosition]);
 
-    const handleKeyPress = (e) => {
-      // Ignore if typing in an input field
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-
-      const tracks = trackSet.tracks || [];
-      
-      switch(e.code) {
-        case 'Space':
-          e.preventDefault();
-          togglePlayPause();
-          break;
-        
-        case 'ArrowUp':
-          e.preventDefault();
-          // Previous track
-          if (currentTrackIndex > 0) {
-            switchTrack(currentTrackIndex - 1);
-          }
-          break;
-        
-        case 'ArrowDown':
-          e.preventDefault();
-          // Next track
-          if (currentTrackIndex < tracks.length - 1) {
-            switchTrack(currentTrackIndex + 1);
-          }
-          break;
-        
-        case 'ArrowLeft':
-          e.preventDefault();
-          // Seek backward 5s
-          if (audioRef.current) {
-            audioRef.current.currentTime = Math.max(0, audioRef.current.currentTime - 5);
-          }
-          break;
-        
-        case 'ArrowRight':
-          e.preventDefault();
-          // Seek forward 5s
-          if (audioRef.current) {
-            audioRef.current.currentTime = Math.min(duration, audioRef.current.currentTime + 5);
-          }
-          break;
-        
-        case 'Digit1':
-        case 'Digit2':
-        case 'Digit3':
-        case 'Digit4':
-        case 'Digit5':
-        case 'Digit6':
-        case 'Digit7':
-        case 'Digit8':
-        case 'Digit9':
-          e.preventDefault();
-          const trackNum = parseInt(e.code.replace('Digit', '')) - 1;
-          if (trackNum < tracks.length) {
-            switchTrack(trackNum);
-          }
-          break;
-        
-        case 'KeyL':
-          e.preventDefault();
-          toggleLoop();
-          break;
-        
-        case 'KeyR':
-          e.preventDefault();
-          handleReset();
-          break;
-        
-        default:
-          break;
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [trackSet, currentTrackIndex, isPlaying, duration]);
-
-  // Set volume on audio element
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = volume;
-    }
-  }, [volume]);
-
-  // Set loop on audio element
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.loop = loopEnabled;
-    }
-  }, [loopEnabled]);
-
-  const togglePlayPause = () => {
+  const togglePlayPause = useCallback(() => {
     if (audioRef.current) {
       if (isPlaying) {
         audioRef.current.pause();
@@ -163,237 +108,276 @@ function AudioPlayer() {
       }
       setIsPlaying(!isPlaying);
     }
-  };
+  }, [isPlaying]);
 
-  const switchTrack = (index) => {
-    if (index === currentTrackIndex) return;
-    
-    const wasPlaying = isPlaying;
-    const savedTime = audioRef.current?.currentTime || 0;
-    savedTimeRef.current = savedTime;
-    
-    setCurrentTrackIndex(index);
-    
-    if (audioRef.current) {
-      const handleCanPlay = () => {
-        if (audioRef.current) {
-          audioRef.current.currentTime = savedTimeRef.current;
-          if (wasPlaying) {
-            audioRef.current.play();
+  // Switch pickup or position with synced playhead
+  const switchAudio = useCallback(
+    (pickupId, position) => {
+      if (pickupId === activePickupId && position === activePosition) return;
+
+      const wasPlaying = isPlaying;
+      const savedTime = audioRef.current?.currentTime || 0;
+      savedTimeRef.current = savedTime;
+
+      setActivePickupId(pickupId);
+      setActivePosition(position);
+
+      if (audioRef.current) {
+        const handleCanPlay = () => {
+          if (audioRef.current) {
+            audioRef.current.currentTime = savedTimeRef.current;
+            if (wasPlaying) {
+              audioRef.current.play();
+            }
           }
-        }
-        audioRef.current?.removeEventListener('canplay', handleCanPlay);
-      };
-      
-      audioRef.current.addEventListener('canplay', handleCanPlay);
-    }
-  };
+          audioRef.current?.removeEventListener("canplay", handleCanPlay);
+        };
+        audioRef.current.addEventListener("canplay", handleCanPlay);
+      }
+    },
+    [activePickupId, activePosition, isPlaying]
+  );
 
   const handleTimeUpdate = () => {
-    if (audioRef.current) {
-      setCurrentTime(audioRef.current.currentTime);
-    }
+    if (audioRef.current) setCurrentTime(audioRef.current.currentTime);
   };
 
   const handleLoadedMetadata = () => {
-    if (audioRef.current) {
-      setDuration(audioRef.current.duration);
-    }
+    if (audioRef.current) setDuration(audioRef.current.duration);
   };
 
   const handleProgressChange = (e) => {
-    const progressBar = e.currentTarget;
-    const rect = progressBar.getBoundingClientRect();
+    const rect = e.currentTarget.getBoundingClientRect();
     const pos = (e.clientX - rect.left) / rect.width;
     const newTime = pos * duration;
-    
     if (audioRef.current) {
       audioRef.current.currentTime = newTime;
       setCurrentTime(newTime);
     }
   };
 
-  const handleVolumeChange = (e) => {
-    const newVolume = parseFloat(e.target.value);
-    setVolume(newVolume);
-  };
+  const handleVolumeChange = (e) => setVolume(parseFloat(e.target.value));
 
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     setVolume(0.7);
-    setCurrentTrackIndex(0);
-    if (audioRef.current) {
-      audioRef.current.currentTime = 0;
+    if (trackSet?.pickups?.length > 0) {
+      setActivePickupId(trackSet.pickups[0].id);
+      setActivePosition("neck");
     }
-  };
+    if (audioRef.current) audioRef.current.currentTime = 0;
+  }, [trackSet]);
 
-  const toggleLoop = () => {
-    setLoopEnabled(!loopEnabled);
-  };
+  const toggleLoop = useCallback(() => setLoopEnabled((prev) => !prev), []);
 
   const formatTime = (seconds) => {
     if (isNaN(seconds)) return "0:00";
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+  // Set volume + loop on audio element
+  useEffect(() => {
+    if (audioRef.current) audioRef.current.volume = volume;
+  }, [volume]);
 
-  // Loading state
+  useEffect(() => {
+    if (audioRef.current) audioRef.current.loop = loopEnabled;
+  }, [loopEnabled]);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    if (!trackSet) return;
+
+    const handleKeyPress = (e) => {
+      if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+
+      const pickups = trackSet.pickups || [];
+      const currentIndex = pickups.findIndex((p) => p.id === activePickupId);
+
+      switch (e.code) {
+        case "Space":
+          e.preventDefault();
+          togglePlayPause();
+          break;
+        case "ArrowUp":
+          e.preventDefault();
+          if (currentIndex > 0) switchAudio(pickups[currentIndex - 1].id, activePosition);
+          break;
+        case "ArrowDown":
+          e.preventDefault();
+          if (currentIndex < pickups.length - 1) switchAudio(pickups[currentIndex + 1].id, activePosition);
+          break;
+        case "ArrowLeft":
+          e.preventDefault();
+          if (audioRef.current) audioRef.current.currentTime = Math.max(0, audioRef.current.currentTime - 5);
+          break;
+        case "ArrowRight":
+          e.preventDefault();
+          if (audioRef.current) audioRef.current.currentTime = Math.min(duration, audioRef.current.currentTime + 5);
+          break;
+        case "KeyL":
+          e.preventDefault();
+          toggleLoop();
+          break;
+        case "KeyR":
+          e.preventDefault();
+          handleReset();
+          break;
+        case "KeyN":
+          e.preventDefault();
+          if (activePickupId) switchAudio(activePickupId, "neck");
+          break;
+        case "KeyM":
+          e.preventDefault();
+          if (activePickupId) switchAudio(activePickupId, "middle");
+          break;
+        case "KeyB":
+          e.preventDefault();
+          if (activePickupId) switchAudio(activePickupId, "bridge");
+          break;
+        default: {
+          const num = parseInt(e.code.replace("Digit", "")) - 1;
+          if (!isNaN(num) && num >= 0 && num < pickups.length) {
+            e.preventDefault();
+            switchAudio(pickups[num].id, activePosition);
+          }
+          break;
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
+  }, [trackSet, activePickupId, activePosition, isPlaying, duration, togglePlayPause, switchAudio, toggleLoop, handleReset]);
+
+  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+  const audioUrl = getActiveAudioUrl();
+
+  // --- RENDER STATES ---
+
   if (loading) {
     return (
-      <div className="viewer-container">
-        <div className="loading-state">Loading track set...</div>
-      </div>
-    );
-  }
-
-  // Error state
-  if (error) {
-    return (
-      <div className="viewer-container">
-        <div className="error-state">
-          <h2>Track Set Not Found</h2>
-          <p>{error}</p>
-          <p className="hint">Check the URL parameter or contact support.</p>
+      <div className="player-wrapper">
+        <div className="player-container">
+          <div className="state-message">Loading track set...</div>
         </div>
       </div>
     );
   }
 
-  // Default state - no track set parameter
+  if (error) {
+    return (
+      <div className="player-wrapper">
+        <div className="player-container">
+          <div className="state-message">
+            <h2 className="error-title">Track Set Not Found</h2>
+            <p>{error}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!trackSet && config) {
     return (
-      <div className="default-container">
-        <div className="default-content">
-          <div className="logo-container">
-            {config.logoUrl ? (
-              <img 
-                src={config.logoUrl} 
-                alt="Logo" 
-                className="custom-logo"
-                onError={(e) => {
-                  // Fallback to SVG if image fails to load
-                  e.target.style.display = 'none';
-                  e.target.nextSibling.style.display = 'block';
-                }}
-              />
-            ) : null}
-            <svg 
-              className="rdsl-logo" 
-              viewBox="0 0 200 200" 
-              fill="none" 
-              xmlns="http://www.w3.org/2000/svg"
-              style={{ display: config.logoUrl ? 'none' : 'block' }}
-            >
-              <circle cx="100" cy="100" r="80" stroke="#d62028" strokeWidth="4" fill="none"/>
-              <path d="M60 100 L90 70 L90 130 Z" fill="#d62028"/>
-              <circle cx="130" cy="100" r="20" fill="#d62028"/>
-            </svg>
+      <div className="default-screen">
+        <div className="default-inner">
+          <div className="logo-wrap">
+            <RDSLLogo />
           </div>
           <h1 className="default-title">{config.defaultTitle}</h1>
           <p className="default-subtitle">{config.defaultSubtitle}</p>
-          <p className="default-hint">Add <code>?set=yourset</code> to the URL to load a track set</p>
+          <p className="default-hint">
+            Add <code>?set=yourset</code> to the URL to load a track set
+          </p>
         </div>
       </div>
     );
   }
 
-  const tracks = trackSet?.tracks || [];
-  const currentTrack = tracks[currentTrackIndex];
+  const pickups = trackSet?.pickups || [];
 
-  if (tracks.length === 0) {
+  if (pickups.length === 0) {
     return (
-      <div className="viewer-container">
-        <div className="empty-state">
-          <p>This track set is empty.</p>
+      <div className="player-wrapper">
+        <div className="player-container">
+          <div className="state-message">This track set is empty.</div>
         </div>
       </div>
     );
   }
+
+  const activePickup = pickups.find((p) => p.id === activePickupId);
 
   return (
-    <div className="viewer-container">
-      {/* Set Name */}
-      <div className="set-name" data-testid="set-name">
-        {trackSet.setName}
-      </div>
-
-      {/* Header with current track */}
-      {currentTrack && (
-        <div className="viewer-header">
-          <img 
-            src={currentTrack.imageUrl}
-            alt={currentTrack.title}
-            className="current-track-image"
-          />
-          <div className="current-track-info">
-            <h2 className="current-track-title" data-testid="current-track-title">
-              {currentTrack.title}
-            </h2>
-            <p className="current-track-description" data-testid="current-track-description">
-              {currentTrack.description}
-            </p>
+    <div className="player-wrapper">
+      <div className="player-container">
+        {/* Header: Logo + Set Name */}
+        <div className="player-header">
+          <div className="header-logo">
+            <RDSLLogo />
+          </div>
+          <div className="header-text">
+            <div className="set-label" data-testid="set-name">{trackSet.setName}</div>
           </div>
         </div>
-      )}
 
-      {/* Play/Pause Button */}
-      <div className="controls-section">
-        <button 
-          className={`loop-btn ${loopEnabled ? 'active' : ''}`}
-          onClick={toggleLoop}
-          data-testid="loop-btn"
-          title="Loop current track (L)"
-        >
-          🔁
-        </button>
-        <button 
-          className="play-pause-btn"
-          onClick={togglePlayPause}
-          data-testid="play-pause-btn"
-        >
-          {isPlaying ? <Pause size={24} /> : <Play size={24} />}
-        </button>
-        <button 
-          className="reset-btn"
-          onClick={handleReset}
-          data-testid="reset-btn"
-          title="Reset to defaults (R)"
-        >
-          ↺
-        </button>
-      </div>
+        {/* Now Playing */}
+        {activePickup && (
+          <div className="now-playing" data-testid="now-playing">
+            <span className="now-playing-label">Now Playing:</span>
+            <span className="now-playing-title">{activePickup.title}</span>
+            <span className="now-playing-pos">{activePosition}</span>
+          </div>
+        )}
 
-      {/* Progress Bar */}
-      <div className="progress-section">
-        <div 
-          className="progress-bar-container" 
-          onClick={handleProgressChange}
-          data-testid="progress-bar"
-        >
-          <div className="progress-bar-track">
-            <div 
-              className="progress-bar-fill" 
-              style={{ width: `${progress}%` }}
-            />
-            <div 
-              className="progress-bar-thumb" 
-              style={{ left: `${progress}%` }}
-            />
+        {/* Transport Controls */}
+        <div className="transport">
+          <button
+            className={`transport-btn ${loopEnabled ? "active" : ""}`}
+            onClick={toggleLoop}
+            data-testid="loop-btn"
+            title="Loop (L)"
+          >
+            <Repeat size={16} />
+          </button>
+
+          <button
+            className="play-btn"
+            onClick={togglePlayPause}
+            data-testid="play-pause-btn"
+          >
+            {isPlaying ? <Pause size={22} /> : <Play size={22} />}
+          </button>
+
+          <button
+            className={`transport-btn`}
+            onClick={handleReset}
+            data-testid="reset-btn"
+            title="Reset (R)"
+          >
+            <RotateCcw size={16} />
+          </button>
+        </div>
+
+        {/* Progress Bar */}
+        <div className="progress-area">
+          <div className="progress-clickable" onClick={handleProgressChange} data-testid="progress-bar">
+            <div className="progress-rail">
+              <div className="progress-fill" style={{ width: `${progress}%` }} />
+              <div className="progress-thumb" style={{ left: `${progress}%` }} />
+            </div>
+          </div>
+          <div className="time-row">
+            <span data-testid="current-time">{formatTime(currentTime)}</span>
+            <span data-testid="duration">{formatTime(duration)}</span>
           </div>
         </div>
-        <div className="time-display">
-          <span data-testid="current-time">{formatTime(currentTime)}</span>
-          <span data-testid="duration">{formatTime(duration)}</span>
-        </div>
-      </div>
 
-      {/* Volume Control */}
-      <div className="volume-section">
-        <div className="volume-label">Volume</div>
-        <div className="volume-control">
-          <span className="volume-icon">🔈</span>
+        {/* Volume */}
+        <div className="volume-area">
+          <span className="vol-label">Vol</span>
           <input
             type="range"
             min="0"
@@ -401,64 +385,78 @@ function AudioPlayer() {
             step="0.01"
             value={volume}
             onChange={handleVolumeChange}
-            className="volume-slider"
+            className="vol-slider"
             data-testid="volume-slider"
           />
-          <span className="volume-icon">🔊</span>
-          <span className="volume-percentage">{Math.round(volume * 100)}%</span>
+          <span className="vol-pct">{Math.round(volume * 100)}%</span>
         </div>
-      </div>
 
-      {/* Keyboard Shortcuts Hint */}
-      <div className="shortcuts-hint">
-        <span>⌨️ Shortcuts: </span>
-        <code>Space</code> Play/Pause · 
-        <code>↑↓</code> Switch Tracks · 
-        <code>←→</code> Seek · 
-        <code>1-9</code> Jump to Track ·
-        <code>L</code> Loop ·
-        <code>R</code> Reset
-      </div>
+        {/* Shortcuts */}
+        <div className="shortcuts-bar">
+          <code>Space</code> Play
+          <code>N</code><code>M</code><code>B</code> Position
+          <code>&#8593;&#8595;</code> Pickup
+          <code>&#8592;&#8594;</code> Seek
+          <code>L</code> Loop
+          <code>R</code> Reset
+        </div>
 
-      {/* Scrollable Track List */}
-      <div className="track-list-scrollable">
-        {tracks.map((track, index) => (
-          <div
-            key={track.id}
-            className={`track-item ${index === currentTrackIndex ? 'active' : ''}`}
-            onClick={() => switchTrack(index)}
-            data-testid={`track-item-${index}`}
-          >
-            <img 
-              src={track.imageUrl}
-              alt={track.title}
-              className="track-thumbnail"
-            />
-            <div className="track-details">
-              <div className="track-item-title">{track.title}</div>
-              <div className="track-item-description">{track.description}</div>
-            </div>
-            {index === currentTrackIndex && isPlaying && (
-              <div className="playing-indicator" data-testid="playing-indicator">
-                <div className="wave"></div>
-                <div className="wave"></div>
-                <div className="wave"></div>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
+        {/* Accordion Track List */}
+        <div className="accordion-area" data-testid="accordion-area">
+          <Accordion type="multiple" defaultValue={pickups.map((p) => p.id)}>
+            {pickups.map((pickup) => {
+              const isActivePickup = pickup.id === activePickupId;
 
-      {/* Hidden Audio Element */}
-      {currentTrack && (
-        <audio
-          ref={audioRef}
-          src={currentTrack.audioUrl}
-          onTimeUpdate={handleTimeUpdate}
-          onLoadedMetadata={handleLoadedMetadata}
-          data-testid="audio-element"
-        />
-      )}
+              return (
+                <AccordionItem
+                  key={pickup.id}
+                  value={pickup.id}
+                  className={`accordion-item ${isActivePickup ? "is-active" : ""}`}
+                  data-testid={`accordion-${pickup.id}`}
+                >
+                  <AccordionTrigger className="accordion-trigger" data-testid={`accordion-trigger-${pickup.id}`}>
+                    <div className="accordion-header-content">
+                      <div className="accordion-title">{pickup.title}</div>
+                      <div className="accordion-desc">{pickup.description}</div>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="accordion-body">
+                    <div className="position-buttons">
+                      {POSITIONS.map((pos) => {
+                        const isActive = isActivePickup && activePosition === pos;
+                        return (
+                          <button
+                            key={pos}
+                            className={`pos-btn ${isActive ? "active" : ""}`}
+                            onClick={() => switchAudio(pickup.id, pos)}
+                            data-testid={`pos-btn-${pickup.id}-${pos}`}
+                          >
+                            {pos.charAt(0).toUpperCase() + pos.slice(1)}
+                            {isActive && isPlaying && (
+                              <span className="playing-dot" />
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              );
+            })}
+          </Accordion>
+        </div>
+
+        {/* Audio Element */}
+        {audioUrl && (
+          <audio
+            ref={audioRef}
+            src={audioUrl}
+            onTimeUpdate={handleTimeUpdate}
+            onLoadedMetadata={handleLoadedMetadata}
+            data-testid="audio-element"
+          />
+        )}
+      </div>
     </div>
   );
 }
