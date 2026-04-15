@@ -44,6 +44,10 @@ function AudioPlayer() {
   const [activePickupId, setActivePickupId] = useState(null);
   const [activePosition, setActivePosition] = useState("neck");
 
+  // Track which pickups have been "visited" (expanded at least once)
+  const [visitedPickups, setVisitedPickups] = useState(new Set());
+  const [openAccordion, setOpenAccordion] = useState("");
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -136,6 +140,19 @@ function AudioPlayer() {
       }
     },
     [activePickupId, activePosition, isPlaying]
+  );
+
+  // When user expands an accordion, default to Neck if first visit
+  const handleAccordionChange = useCallback(
+    (value) => {
+      setOpenAccordion(value);
+
+      if (value && !visitedPickups.has(value)) {
+        setVisitedPickups((prev) => new Set(prev).add(value));
+        switchAudio(value, "neck");
+      }
+    },
+    [visitedPickups, switchAudio]
   );
 
   const handleTimeUpdate = () => {
@@ -403,7 +420,12 @@ function AudioPlayer() {
 
         {/* Accordion Track List */}
         <div className="accordion-area" data-testid="accordion-area">
-          <Accordion type="multiple" defaultValue={pickups.map((p) => p.id)}>
+          <Accordion
+            type="single"
+            collapsible
+            value={openAccordion}
+            onValueChange={handleAccordionChange}
+          >
             {pickups.map((pickup) => {
               const isActivePickup = pickup.id === activePickupId;
 

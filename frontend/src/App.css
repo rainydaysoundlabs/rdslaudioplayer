@@ -353,7 +353,27 @@
 
 /* ===== ACCORDION ===== */
 .accordion-area {
-  margin-top: 0;
+  max-height: 50vh;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+.accordion-area::-webkit-scrollbar {
+  width: 5px;
+}
+
+.accordion-area::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 3px;
+}
+
+.accordion-area::-webkit-scrollbar-thumb {
+  background: rgba(214, 32, 40, 0.4);
+  border-radius: 3px;
+}
+
+.accordion-area::-webkit-scrollbar-thumb:hover {
+  background: rgba(214, 32, 40, 0.6);
 }
 
 .accordion-item {
