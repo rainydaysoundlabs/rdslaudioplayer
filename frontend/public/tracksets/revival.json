@@ -1,1 +1,57 @@
-
+{
+  "setName": "Revival PAF",
+  "description": "A return to the tonal zenith of the original Patent Applied For era. Features unpotted coils and offset windings for maximum harmonic bloom and a vocal midrange.",
+  "config": "3-Position Humbucker",
+  "accordions": [
+    {
+      "id": "clean-chords",
+      "label": "Clean Chords",
+      "description": "Descending progression (D-C-G/B-Bb) demonstrating harmonic separation and airy resonance.",
+      "positions": {
+        "neck": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_HB_PAF_CLN_Chord_NeckDRM_01.mp3?v=1776527695",
+        "middle": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_HB_PAF_CLN_Chord_MiddleDRM_01.mp3?v=1776527695",
+        "bridge": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_HB_PAF_CLN_Chord_BridgeDRM_01.mp3?v=1776527695"
+      }
+    },
+    {
+      "id": "clean-arp",
+      "label": "Clean Arpeggio",
+      "description": "Detailed string-to-string clarity and transient 'snap' against a light rhythmic bed.",
+      "positions": {
+        "neck": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_HB_PAF_CLN_Arp_NeckDRM_01.mp3?v=1776527695",
+        "middle": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_HB_PAF_CLN_Arp_MiddleDRM_01.mp3?v=1776527695",
+        "bridge": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_HB_PAF_CLN_Arp_BridgeDRM_01.mp3?v=1776527695"
+      }
+    },
+    {
+      "id": "clean-notes",
+      "label": "Clean Single Notes",
+      "description": "Showcasing the 'vocal' flutey sustain and touch-sensitive dynamic response.",
+      "positions": {
+        "neck": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_HB_PAF_CLN_Notes_NeckDRM_01.mp3?v=1776527694",
+        "middle": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_HB_PAF_CLN_Notes_MiddleDRM_01.mp3?v=1776527694",
+        "bridge": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_HB_PAF_CLN_Notes_BridgeDRM_01.mp3?v=1776527694"
+      }
+    },
+    {
+      "id": "edge-breakup",
+      "label": "Edge of Breakup",
+      "description": "Low-gain grit highlighting the harmonic 'bloom' and unpotted sizzle.",
+      "positions": {
+        "neck": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_HB_PAF_EDG_Brkup_NeckDRM_01.mp3?v=1776527694",
+        "middle": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_HB_PAF_EDG_Brkup_MiddleDRM_01.mp3?v=1776527695",
+        "bridge": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_HB_PAF_EDG_Brkup_BridgeDRM_01.mp3?v=1776527695"
+      }
+    },
+    {
+      "id": "edge-distortion",
+      "label": "Vintage Dirt",
+      "description": "Classic saturated leads and rhythm demonstrating clarity under high gain.",
+      "positions": {
+        "neck": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_HB_PAF_EDG_Dirt_NeckDRM_01.mp3?v=1776527694",
+        "middle": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_HB_PAF_EDG_Dirt_MiddleDRM_01.mp3?v=1776527694",
+        "bridge": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_HB_PAF_EDG_Dirt_BridgeDRM_01.mp3?v=1776527695"
+      }
+    }
+  ]
+}
