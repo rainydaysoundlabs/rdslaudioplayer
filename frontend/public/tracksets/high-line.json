@@ -1,51 +1,101 @@
-{% if product.metafields.custom.audio_set_handle != blank %}
-<style>
-  #toneLabModal, #toneLabModal * {
-    box-shadow: none !important;
-    text-shadow: none !important;
-    background-image: none !important;
-  }
-  .rdsl-lab-btn:hover {
-    background-color: #d62028 !important;
-    color: #ffffff !important;
-  }
-</style>
-
-<div style="margin: 20px 0; width: 100%; text-align: center;">
-  <button onclick="openToneLab('{{ product.metafields.custom.audio_set_handle }}')" class="rdsl-lab-btn" style="width: 100%; max-width: 350px; background-color:#ffffff; color:#d62028; padding:12px 24px; border:2px solid #d62028; border-radius:4px; cursor:pointer; font-weight:800; font-size: 15px; text-transform: uppercase; letter-spacing: 1.2px; transition: 0.3s ease-in-out;">
-    LISTEN TO THE {{ product.title }}
-  </button>
-</div>
-
-<div id="toneLabModal" style="display:none !important; position:fixed !important; z-index:999999 !important; top:0 !important; left:0 !important; right:0 !important; bottom:0 !important; width:100vw !important; height:100vh !important; background-color:rgba(0,0,0,0.95) !important; align-items: center !important; justify-content: center !important; margin: 0 !important; padding: 0 !important; border: none !important;">
-  <div style="position:fixed !important; top:50% !important; left:50% !important; transform: translate(-50%, -50%) !important; width:95% !important; max-width:520px !important; aspect-ratio: 2 / 3 !important; background:#000 !important; padding:0 !important; border:1px solid #333 !important; border-radius:8px !important; box-shadow: 0 20px 50px rgba(0,0,0,1) !important; overflow: hidden !important; display: flex !important; flex-direction: column !important; margin: 0 !important;">
-    <span onclick="closeToneLab()" style="position:absolute; right:15px; top:10px; color:#fff !important; font-size:32px !important; cursor:pointer !important; line-height:1 !important; z-index: 101 !important;">&times;</span>
-    <iframe id="toneLabFrame" src="" width="100%" height="100%" style="border:none !important; flex-grow: 1 !important; background: #000 !important; display: block !important; margin: 0 !important; padding: 0 !important;"></iframe>
-  </div>
-</div>
-
-<script>
-function openToneLab(setHandle) {
-  const modal = document.getElementById('toneLabModal');
-  const frame = document.getElementById('toneLabFrame');
-  frame.src = "https://rdslaudioplayer.netlify.app/?set=" + setHandle;
-  modal.style.setProperty('display', 'flex', 'important');
-  document.body.style.overflow = 'hidden';
+{
+  "setName": "High-Line Telecaster Series",
+  "logoUrl": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_Logo01.svg?v=1761855758",
+  "pickups": [
+    {
+      "id": "hl-cln-chrd",
+      "title": "Clean Chords",
+      "description": "RDSL High-Line set showing harmonic density and headroom.",
+      "positions": {
+        "neck": {
+          "audioUrl": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_TELE_HL_CLN_CHRD_NECK01.mp3?v=1776277059",
+          "imageUrl": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_Logo01.svg?v=1761855758"
+        },
+        "middle": {
+          "audioUrl": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_TELE_HL_CLN_CHRD_MIDDLE01.mp3?v=1776277059",
+          "imageUrl": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_Logo01.svg?v=1761855758"
+        },
+        "bridge": {
+          "audioUrl": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_TELE_HL_CLN_CHRD_BRIDGE01.mp3?v=1776277059",
+          "imageUrl": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_Logo01.svg?v=1761855758"
+        }
+      }
+    },
+    {
+      "id": "hl-cln-arp",
+      "title": "Clean Arpeggios",
+      "description": "Note separation and string-to-string clarity.",
+      "positions": {
+        "neck": {
+          "audioUrl": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_TELE_HL_CLN_ARP_NECK01.mp3?v=1776277059",
+          "imageUrl": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_Logo01.svg?v=1761855758"
+        },
+        "middle": {
+          "audioUrl": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_TELE_HL_CLN_ARP_MIDDLE01.mp3?v=1776277059",
+          "imageUrl": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_Logo01.svg?v=1761855758"
+        },
+        "bridge": {
+          "audioUrl": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_TELE_HL_CLN_ARP_BRIDGE01.mp3?v=1776277059",
+          "imageUrl": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_Logo01.svg?v=1761855758"
+        }
+      }
+    },
+    {
+      "id": "hl-cln-note",
+      "title": "Clean Single Notes",
+      "description": "Highlighting touch sensitivity and vocal-like resonance.",
+      "positions": {
+        "neck": {
+          "audioUrl": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_TELE_HL_CLN_NOTES_NECK01.mp3?v=1776277058",
+          "imageUrl": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_Logo01.svg?v=1761855758"
+        },
+        "middle": {
+          "audioUrl": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_TELE_HL_CLN_NOTES_MIDDLE01.mp3?v=1776277058",
+          "imageUrl": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_Logo01.svg?v=1761855758"
+        },
+        "bridge": {
+          "audioUrl": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_TELE_HL_CLN_NOTES_BRIDGE01.mp3?v=1776277058",
+          "imageUrl": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_Logo01.svg?v=1761855758"
+        }
+      }
+    },
+    {
+      "id": "hl-edg-rytm",
+      "title": "Grit Rhythm",
+      "description": "Edge of breakup with defined note separation.",
+      "positions": {
+        "neck": {
+          "audioUrl": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_TELE_HL_EDG_RYTM_NECK01.mp3?v=1776277059",
+          "imageUrl": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_Logo01.svg?v=1761855758"
+        },
+        "middle": {
+          "audioUrl": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_TELE_HL_EDG_RYTM_MIDDLE01.mp3?v=1776277059",
+          "imageUrl": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_Logo01.svg?v=1761855758"
+        },
+        "bridge": {
+          "audioUrl": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_TELE_HL_EDG_RYTM_BRIDGE01.mp3?v=1776277059",
+          "imageUrl": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_Logo01.svg?v=1761855758"
+        }
+      }
+    },
+    {
+      "id": "hl-edg-lead",
+      "title": "Grit Lead",
+      "description": "Sustained harmonic 'bloom' and aggressive pick attack.",
+      "positions": {
+        "neck": {
+          "audioUrl": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_TELE_HL_EDG_LEAD_NECK01.mp3?v=1776277059",
+          "imageUrl": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_Logo01.svg?v=1761855758"
+        },
+        "middle": {
+          "audioUrl": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_TELE_HL_EDG_LEAD_MIDDLE01.mp3?v=1776277059",
+          "imageUrl": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_Logo01.svg?v=1761855758"
+        },
+        "bridge": {
+          "audioUrl": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_TELE_HL_EDG_LEAD_BRIDGE01.mp3?v=1776277058",
+          "imageUrl": "https://cdn.shopify.com/s/files/1/0706/3191/5574/files/RDSL_Logo01.svg?v=1761855758"
+        }
+      }
+    }
+  ]
 }
-
-function closeToneLab() {
-  const modal = document.getElementById('toneLabModal');
-  const frame = document.getElementById('toneLabFrame');
-  modal.style.display = "none";
-  document.body.style.overflow = 'auto';
-  frame.src = "";
-}
-
-window.onclick = function(event) {
-  const modal = document.getElementById('toneLabModal');
-  if (event.target == modal) {
-    closeToneLab();
-  }
-}
-</script>
-{% endif %}
