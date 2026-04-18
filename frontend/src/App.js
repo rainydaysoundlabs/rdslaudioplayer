@@ -52,7 +52,7 @@ function AudioPlayer() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(0.7);
-  const [loopEnabled, setLoopEnabled] = useState(false);
+  const [loopEnabled, setLoopEnabled] = useState(true);
 
   const audioRef = useRef(null);
   const savedTimeRef = useRef(0);
@@ -130,6 +130,7 @@ function AudioPlayer() {
         const handleCanPlay = () => {
           if (audioRef.current) {
             audioRef.current.currentTime = savedTimeRef.current;
+            audioRef.current.loop = loopEnabled;
             if (wasPlaying) {
               audioRef.current.play();
             }
@@ -160,7 +161,11 @@ function AudioPlayer() {
   };
 
   const handleLoadedMetadata = () => {
-    if (audioRef.current) setDuration(audioRef.current.duration);
+    if (audioRef.current) {
+      setDuration(audioRef.current.duration);
+      audioRef.current.loop = loopEnabled;
+      audioRef.current.volume = volume;
+    }
   };
 
   const handleProgressChange = (e) => {
